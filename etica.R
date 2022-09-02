@@ -16,7 +16,7 @@ library(ggplot2)
 library(wordcloud)
 library(readtext)
 library(syuzhet)
-library(readr)
+library(readxl)
 
 etica <- read_excel("Código de Ética - Hospital Roberto del Río (Respuestas).xlsx")
 
@@ -32,7 +32,10 @@ unas_stopwords <- read_csv("https://raw.githubusercontent.com/7PartidasDigital/A
 # Ahora, vamos a tokenizar nuestro texto
 otras_stopwords <- tibble(palabra = c("nada", "visto", "ninguno", NA, "as", 
                                       "tengo", "2", "ser", "años", "2",
-                                      "nk", "3", "7", "mucho", "ningún"))
+                                      "nk", "3", "7", "mucho", "ningún", "tb",
+                                      "cae", "alguien", "veo", "vs", "44", "50", "doce",
+                                      "2012", "muchos", "mismo", "bien", "varios",
+                                      "algun", "da", "dar", "ejemplo", "encuesta"))
 
 frecuencias_etica <- tibble(encuesta_etica = texto_libre) %>% 
   unnest_tokens(input = encuesta_etica, 
@@ -62,6 +65,7 @@ bigrama <- tibble(discurso = texto_libre) %>%
          !palabra2 %in% otras_stopwords$palabra,
          !palabra1 %in% otras_stopwords$palabra) %>% 
   unite(col = "bigrama", c(palabra1, palabra2), sep = " ")
+
 
 #####
 tibble(discurso = texto_libre) %>% 
@@ -124,3 +128,63 @@ sentimientos <- read_tsv("https://raw.githubusercontent.com/7PartidasDigital/Ana
   select(-valor)
 
 write_rds(sentimientos, "sentimientos.rds")
+
+###### agrupacion 
+bigrama <- bigrama %>% mutate("Categoría agrupada" = case_when(
+  #00102 Medico Especialista
+  bigrama == "horas extras"~"horas extras",
+  bigrama == "horas extraordinarias"~"horas extras",
+  bigrama == "cobrar horas"~"horas extras",
+  
+  bigrama == "concurso publico"~"concursos públicos",
+  bigrama == "concurso públicos"~"concursos públicos",
+  bigrama == "públicos arreglados"~"concursos públicos",
+  bigrama == "cargos arreglados"~"concursos públicos",
+  bigrama == "concursos abiertos"~"concursos públicos",
+  bigrama == "concursos públicos"~"concursos públicos",
+  bigrama == "concursos publicos"~"concursos públicos",
+  bigrama == "van dirigidos"~"concursos públicos",
+  bigrama == "subir grados"~"concursos públicos",
+  bigrama == "cumplir requisitos"~"concursos públicos",
+  bigrama == "cargos dirigidos"~"concursos públicos",
+  
+  
+  bigrama == "acoso laboral"~"maltrato laboral",
+  bigrama == "malos tratos"~"maltrato laboral",
+  bigrama == "maltrato laboral"~"maltrato laboral",
+  bigrama == "tratos inadecuados"~"maltrato laboral",
+  bigrama == "buen trato"~"maltrato laboral",
+  bigrama == "buena convivencia"~"maltrato laboral",
+  bigrama == "buena cordialidad"~"maltrato laboral",
+  bigrama == "buena onda"~"maltrato laboral",
+  bigrama == "burlas frente"~"maltrato laboral",
+  bigrama == "aceptar presiones"~"maltrato laboral",
+  bigrama == "haciendo burlas"~"maltrato laboral",
+  
+  
+  bigrama == "licencia medica"~"licencias médicas",
+  bigrama == "licencia menor"~"licencias médicas",
+  bigrama == "licencias anunciadas"~"licencias médicas",
+  bigrama == "licencias falsas"~"licencias médicas",
+  bigrama == "licencias medicas"~"licencias médicas",
+  bigrama == "livencia medica"~"licencias médicas",
+  bigrama == "licencias médicas"~"licencias médicas",
+  
+  bigrama == "recursos públicos"~"uso de recursos públicos",
+  bigrama == "administrativos gasto"~"uso de recursos públicos",
+  bigrama == "buen uso"~"uso de recursos públicos",
+  bigrama == "mal uso"~"uso de recursos públicos",
+  bigrama == "bienes innecesarios"~"uso de recursos públicos",
+  
+  
+  bigrama == "horario laboral"~"horario laboral",
+  bigrama == "jornada laboral"~"horario laboral",
+  bigrama == "cumplen horario"~"horario laboral",
+  bigrama == "cumplir horario"~"horario laboral",
+  
+  
+  TRUE ~ ""))
+
+
+##### GRABA
+openxlsx::write.xlsx(bigrama, file = "bigrama.xlsx", colNames = TRUE, overwrite = TRUE)
