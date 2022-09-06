@@ -185,6 +185,24 @@ bigrama <- bigrama %>% mutate("Categoría agrupada" = case_when(
   
   TRUE ~ ""))
 
+##### Valores
+valores <- etica$`De esta lista de valores, ¿ cuales cree usted que deberían representar al hospital? Marque 5`
+
+
+
+valores_df <- strsplit(valores, ",")
+
+lista_valores <- data.frame(Valores = "valor")
+
+for (i in 1:300) {
+  a <- data.frame(valores_df[i])
+  colnames(a)[1] <- "Valores"
+  lista_valores <- rbind(lista_valores, a)
+}
+
+lista_valores <- lista_valores %>% filter(Valores != "valor")
+
+
 
 ##### GRABA
 openxlsx::write.xlsx(bigrama, file = "bigrama.xlsx", colNames = TRUE, overwrite = TRUE)
