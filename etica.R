@@ -189,6 +189,30 @@ bigrama <- bigrama %>% mutate("Categoría agrupada" = case_when(
 valores <- etica$`De esta lista de valores, ¿ cuales cree usted que deberían representar al hospital? Marque 5`
 
 
+valores_df <- strsplit(valores, ",")
+
+lista_valores <- data.frame(Valores = "valor")
+
+for (i in 1:300) {
+  a <- data.frame(valores_df[i])
+  colnames(a)[1] <- "Valores"
+  lista_valores <- rbind(lista_valores, a)
+}
+
+lista_valores <- lista_valores %>% filter(Valores != "valor")
+
+
+##### abiertas
+abiertas1 <- data.frame(etica$`cat 1`)
+abiertas2 <- data.frame(etica$`cat 2`)
+abiertas3 <- data.frame(etica$`cat 3`)
+colnames(abiertas1)[1] <- "categoria"
+colnames(abiertas2)[1] <- "categoria"
+colnames(abiertas3)[1] <- "categoria"
+
+abiertas <- rbind(abiertas1, abiertas2, abiertas3)
+abiertas  <- abiertas  %>% filter(is.na(abiertas$categoria)==FALSE)
+
 
 valores_df <- strsplit(valores, ",")
 
@@ -203,6 +227,7 @@ for (i in 1:300) {
 lista_valores <- lista_valores %>% filter(Valores != "valor")
 
 
-
 ##### GRABA
 openxlsx::write.xlsx(bigrama, file = "bigrama.xlsx", colNames = TRUE, overwrite = TRUE)
+#openxlsx::write.xlsx(lista_valores, file = "valores.xlsx", colNames = TRUE, overwrite = TRUE)
+#openxlsx::write.xlsx(abiertas, file = "abiertas.xlsx", colNames = TRUE, overwrite = TRUE)
